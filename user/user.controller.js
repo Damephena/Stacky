@@ -20,7 +20,9 @@ exports.register = async (req, res) => {
 
         await user.save()
         const data = _.pick(user, ['_id', 'firstName', 'lastName', 'email'])
-        res.send(data)
+
+        const token = user.generateAuthToken()
+        res.header('x-auth-token', token).send(data)
     }
     catch (err) {
         console.log(err.message)
