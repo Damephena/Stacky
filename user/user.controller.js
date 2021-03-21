@@ -50,8 +50,7 @@ exports.requestResetPassword = async (req, res) => {
 
     const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`
     sendEmail(
-        // user.email,
-        'okoyeifenna24@gmail.com',
+        user.email,
         'Stacky: Password Reset Request',
         {name: user.firstName, link: link},
         './template/requestResetPassword.handlebars'
