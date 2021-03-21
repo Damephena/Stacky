@@ -1,18 +1,29 @@
+require('express-async-errors')
+
+const error = require('./middlewares/error')
+const db = require('./config/config').get(process.env.NODE_ENV)
 const userRoutes = require('./user/user.routes')
-// const auth = require('./middlewares/auth')
+const login = require('./user/login')
 
 const express = require('express')
 const mongoose = require('mongoose')
 const logger = require('morgan')
+const helmet = require('helmet')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const db = require('./config/config').get(process.env.NODE_ENV)
+const winston = require('winston')
+const cors = require('cors')
 
 const app = express()
+
+winston.add(new winston.transports.File({filename: 'logfile.log'}))
+
 const port = process.env.PORT || 8000
 app.set('port', port)
 
-app.use(logger('dev'))
+app.use(cors())
+app.use(helmet())
+app.use(logger('combined'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true}))
 app.use(cookieParser())
@@ -34,6 +45,8 @@ app.get('/', (req, res) => {
     res.status(200).send('Welcome to Stacky application')
 })
 app.use('/api/users', userRoutes)
-// app.use('/api/auth', auth)
+app.use('/api/login', login)
+
+app.use(error)
 
 app.listen(port, () => { console.log(`Server running on port ${port}`)})
